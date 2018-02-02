@@ -1,27 +1,27 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+import { Router, Route } from 'react-router';
+import createHashHistory from 'history/createHashHistory';
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
-import createHashHistory from 'history/createHashHistory';
-import { Route } from 'react-router-dom';
-import { ConnectedRouter, routerMiddleware } from 'react-router-redux';
-import App from './components/App';
-import reducer from './reducer';
+import { routerMiddleware } from 'react-router-redux';
+import reducer from './reducers';
+import App from './components/App/App.component';
 
 const history = createHashHistory();
-const store = createStore(reducer, {}, composeWithDevTools(
-  applyMiddleware(thunk, routerMiddleware(history)),
-));
+const store = createStore(
+  reducer,
+  {},
+  composeWithDevTools(applyMiddleware(thunk, routerMiddleware(history))),
+);
 
-ReactDOM.render(
+render(
   <Provider store={store}>
-    <ConnectedRouter history={history}>
-      <div>
-        <Route exact path="/" component={App} />
-      </div>
-    </ConnectedRouter>
+    <Router history={history}>
+      <Route exact path="/" component={App} />
+    </Router>
   </Provider>,
   document.getElementById('app'),
 );
