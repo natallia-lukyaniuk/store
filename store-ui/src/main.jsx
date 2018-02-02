@@ -9,6 +9,9 @@ import thunk from 'redux-thunk';
 import { routerMiddleware } from 'react-router-redux';
 import reducer from './reducers';
 import App from './components/App/App.component';
+import Dashboard from './components/Dashboard/Dashboard.component';
+import Login from './components/Login/Login.component';
+import './index.scss';
 
 const history = createHashHistory();
 const store = createStore(
@@ -20,8 +23,12 @@ const store = createStore(
 render(
   <Provider store={store}>
     <Router history={history}>
-      <Route exact path="/" component={App} />
+      <div className="app">
+        <Route exact path="/" component={App} />
+        <Route path="/login" component={Login} />
+        <Route path="/dashboard" component={Dashboard} />
+      </div>
     </Router>
   </Provider>,
-  document.getElementById('app'),
+  document.getElementById('root'),
 );

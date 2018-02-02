@@ -1,25 +1,20 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Router, Route } from 'react-router';
 import PropTypes from 'prop-types';
+import Dashboard from '../Dashboard/Dashboard.component';
+import Login from '../Login/Login.component';
+import AuthService from '../../utils/auth.service';
 
-class App extends Component {
+
+class App extends React.Component {
   render() {
-    return (
-      <div>
-        App
-      </div>
-    );
+    return AuthService.getToken() ? <Dashboard /> : <Login />;
   }
 }
 
-App.propTypes = {
-  users: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
-
 function mapStateToProps(state) {
-  const { users } = state;
   return {
-    users,
   };
 }
 

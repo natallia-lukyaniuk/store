@@ -1,0 +1,21 @@
+.login {
+    // background-color: #e0e7ff;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .form {
+        padding: 30px;
+        border: 1px solid gainsboro;
+        border-radius: 5px;
+
+        &__field {
+            display: block;
+            margin: 10px 0;
+            border: 1px solid gainsboro;
+            border-radius: 5px;
+            padding: 5px;
+        }
+    }
+}
