@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import './dashboard.component.scss';
+import withAuth from '../withAuth';
 
 class Dashboard extends Component {
   render() {
@@ -21,4 +22,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps)(withAuth(Dashboard));

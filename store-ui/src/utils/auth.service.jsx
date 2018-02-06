@@ -1,58 +1,93 @@
-import * as jwtDecode from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
+// import { fetch } from 'whatwg-fetch';
+// require('whatwg-fetch');
 
 export const TOKEN_NAME = 'jwt_token';
 
-export default class AuthenticationService {
-  static getToken() {
-    return localStorage.getItem(TOKEN_NAME);
+export default class AuthService {
+  constructor(domain) {
+    this.domain = domain || 'http://localhost:8000';
+    this.fetch = this.fetch.bind(this);
+    this.login = this.login.bind(this);
+    this.getProfile = this.getProfile.bind(this);
   }
 
-  static setToken(token) {
-    localStorage.setItem(TOKEN_NAME, token);
+  login(username, password) {
+    return this.fetch(`${this.domain}/api/authenticate`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    }).then((res) => {
+      this.setToken(res.token);
+      return Promise.resolve(res);
+    });
   }
 
-  static getTokenExpirationDate(token) {
-    const decoded = jwtDecode(token);
-
-    if (decoded.exp === undefined) {
-      return null;
-    }
-
-    const date = new Date(0);
-    date.setUTCSeconds(decoded.exp);
-    return date;
+  loggedIn() {
+    const token = this.getToken();
+    return !!token && !this.isTokenExpired(token);
   }
 
-  static isTokenExpired(token) {
-    if (!token) {
-      token = this.getToken();
+   isTokenExpired(token) {
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.exp < Date.now() / 1000) {
+        return true;
+      } else {
+        return false;
+      }
     }
-
-    if (!token) {
-      return true;
-    }
-
-    const date = this.getTokenExpirationDate(token);
-    if (date === undefined) {
+    catch (err) {
       return false;
     }
-
-    return !(date.valueOf() > new Date().valueOf());
   }
 
-  static login(name, password) {
-    const user = {
-      login: name,
-      password,
+   setToken(idToken) {
+    localStorage.setItem('id_token', idToken);
+  }
+
+   getToken() {
+    return localStorage.getItem('id_token');
+  }
+
+   logout() {
+    localStorage.removeItem('id_token');
+  }
+
+  getProfile() {
+    return jwtDecode(this.getToken());
+  }
+
+
+  fetch(url, options) {
+    const headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, PUT, PATCH, OPTIONS',
     };
-    return this.http
-      .post('http://localhost:3000/api/authenticate', JSON.stringify(user))
-      .map(res => res);
+
+    if (this.loggedIn()) {
+      headers['Authorization'] = this.getToken();
+    }
+
+    return fetch(url, {
+      headers,
+      ...options,
+    })
+      .then(this.checkStatus)
+      .then(response => response.json());
   }
 
-  static logout() {
-    // clear token remove user from local storage to log user out
-    this.setToken(null);
-    localStorage.removeItem(TOKEN_NAME);
+   checkStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+      return response;
+    } else {
+      const error = new Error(response.statusText);
+      error.response = response;
+      throw error;
+    }
   }
 }
