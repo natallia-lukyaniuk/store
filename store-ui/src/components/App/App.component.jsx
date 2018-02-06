@@ -6,6 +6,7 @@ import Dashboard from '../Dashboard/Dashboard.component';
 import Login from '../Login/Login.component';
 import AuthService from '../../utils/auth.service';
 import withAuth from '../withAuth';
+import { Link } from 'react-router-dom';
 
 const Auth = new AuthService();
 
@@ -19,7 +20,6 @@ class App extends React.Component {
     return (
       <div className="App">
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome {this.props.user.username}</h2>
         </div>
         <p className="App-intro">
@@ -30,6 +30,7 @@ class App extends React.Component {
             Logout
           </button>
         </p>
+        <Link to={'/dashboard'}>Dashboard</Link>
       </div>
     );
   }
